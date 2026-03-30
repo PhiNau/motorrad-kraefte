@@ -15,7 +15,7 @@
       --good: #1d7a36;
       --warn: #b36b00;
       --danger: #b3002d;
-      --force-g: #f3a512;
+      --force-g: #0066ff;
       --force-z: #e12929;
       --force-r: #800080;
     }
@@ -271,14 +271,14 @@
       <article class="card sim-wrap" aria-label="Simulation">
         <svg id="simSvg" viewBox="-180 0 1080 620" role="img" aria-label="Motorrad mit Kraftpfeilen in der Kurve">
           <defs>
-            <marker id="arrowRed" markerWidth="2.3" markerHeight="2.3" refX="2.0" refY="1.15" orient="auto">
-              <path d="M0,0 L2.3,1.15 L0,2.3 Z" fill="#e12929"></path>
+            <marker id="arrowRed" markerWidth="2.8" markerHeight="2.8" refX="2.0" refY="1.4" orient="auto">
+              <path d="M0,0 L2.8,1.4 L0,2.8 Z" fill="#e12929"></path>
             </marker>
-            <marker id="arrowOrange" markerWidth="2.3" markerHeight="2.3" refX="2.0" refY="1.15" orient="auto">
-              <path d="M0,0 L2.3,1.15 L0,2.3 Z" fill="#f3a512"></path>
+            <marker id="arrowOrange" markerWidth="2.8" markerHeight="2.8" refX="2.0" refY="1.4" orient="auto">
+              <path d="M0,0 L2.8,1.4 L0,2.8 Z" fill="#0066ff"></path>
             </marker>
-            <marker id="arrowBlack" markerWidth="2.3" markerHeight="2.3" refX="2.0" refY="1.15" orient="auto">
-              <path d="M0,0 L2.3,1.15 L0,2.3 Z" fill="#800080"></path>
+            <marker id="arrowBlack" markerWidth="2.8" markerHeight="2.8" refX="2.0" refY="1.4" orient="auto">
+              <path d="M0,0 L2.8,1.4 L0,2.8 Z" fill="#800080"></path>
             </marker>
           </defs>
 
@@ -293,11 +293,11 @@
           <line id="bikeAxis" x1="440" y1="260" x2="340" y2="560" stroke="#2b2b2b" stroke-width="5"></line>
 
           <line id="fz" x1="440" y1="260" x2="320" y2="260" stroke="#e12929" stroke-width="6" marker-end="url(#arrowRed)"></line>
-          <line id="fg" x1="440" y1="260" x2="440" y2="420" stroke="#f3a512" stroke-width="6" marker-end="url(#arrowOrange)"></line>
+          <line id="fg" x1="440" y1="260" x2="440" y2="420" stroke="#0066ff" stroke-width="6" marker-end="url(#arrowOrange)"></line>
           <line id="fres" x1="440" y1="260" x2="320" y2="420" stroke="#800080" stroke-width="6" marker-end="url(#arrowBlack)"></line>
 
           <text id="labelFz" class="vector-label" text-anchor="middle" x="310" y="240" fill="#e12929">F<tspan baseline-shift="sub">Z</tspan></text>
-          <text id="labelFg" class="vector-label" x="450" y="435" fill="#f3a512">F<tspan baseline-shift="sub">G</tspan></text>
+          <text id="labelFg" class="vector-label" x="450" y="435" fill="#0066ff">F<tspan baseline-shift="sub">G</tspan></text>
           <text id="labelFr" class="vector-label" text-anchor="middle" x="315" y="432" fill="#800080">F<tspan baseline-shift="sub">Res</tspan></text>
 
           <path id="alphaSector" d="" fill="#f7e9a8" fill-opacity="0.68"></path>
