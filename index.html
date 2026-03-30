@@ -1,0 +1,507 @@
+﻿<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Motorrad in der Kurve - Kraftsimulation</title>
+  <style>
+    :root {
+      --bg-top: #f6f4ef;
+      --bg-bottom: #dce8e3;
+      --panel: #ffffff;
+      --ink: #132225;
+      --muted: #4b5e62;
+      --accent: #0e7c86;
+      --good: #1d7a36;
+      --warn: #b36b00;
+      --danger: #b3002d;
+      --force-g: #f3a512;
+      --force-z: #e12929;
+      --force-r: #1c1c1c;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Bahnschrift", "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 500px at 90% -20%, #bfd8d8 0%, transparent 60%),
+        linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+    }
+
+    .page {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 1.25rem;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .hero {
+      background: #f8fbfa;
+      border: 1px solid #c9d8d7;
+      border-radius: 18px;
+      padding: 1rem 1.1rem;
+      box-shadow: 0 10px 30px rgba(12, 35, 44, 0.07);
+    }
+
+    h1 {
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      font-size: clamp(1.15rem, 2.2vw, 1.7rem);
+    }
+
+    .subtitle {
+      margin: 0.45rem 0 0;
+      color: var(--muted);
+      font-size: 0.97rem;
+      line-height: 1.45;
+      max-width: 75ch;
+    }
+
+    .layout {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+      align-items: start;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid #c9d8d7;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(12, 35, 44, 0.08);
+      overflow: hidden;
+    }
+
+    .sim-wrap {
+      padding: 0.75rem;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #f1f2f4 0%, #eef0f2 58%, #d8dde0 58%, #d8dde0 100%);
+    }
+
+    .bike-image {
+      pointer-events: none;
+      image-rendering: auto;
+    }
+
+    .controls {
+      padding: 1rem;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .control {
+      border: 1px solid #d4dfde;
+      border-radius: 12px;
+      padding: 0.75rem;
+      background: #f8fbfa;
+    }
+
+    .label-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      align-items: baseline;
+      font-size: 0.95rem;
+      margin-bottom: 0.55rem;
+    }
+
+    .label-line strong {
+      font-size: 1.02rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .facts {
+      display: grid;
+      gap: 0.4rem;
+      margin-top: 0.3rem;
+      font-size: 0.95rem;
+    }
+
+    .facts div {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .facts span:last-child {
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+    }
+
+    .status {
+      border-radius: 12px;
+      padding: 0.7rem 0.8rem;
+      border: 1px solid #ced9d8;
+      background: #f9fbfa;
+      font-size: 0.95rem;
+      line-height: 1.35;
+    }
+
+    .status.good {
+      border-color: #8dc29c;
+      background: #ecf8f0;
+      color: var(--good);
+    }
+
+    .status.warn {
+      border-color: #e8c78a;
+      background: #fff7e8;
+      color: var(--warn);
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem 1rem;
+      font-size: 0.88rem;
+      color: #2a3a3d;
+      margin-top: 0.25rem;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .line-dot {
+      width: 18px;
+      height: 4px;
+      border-radius: 99px;
+      display: inline-block;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.35;
+      margin: 0;
+    }
+
+    .vector-label {
+      font-weight: 700;
+      font-size: 31px;
+      font-style: italic;
+      paint-order: stroke fill;
+      stroke: #f7fafb;
+      stroke-width: 6;
+      stroke-linejoin: round;
+    }
+
+    .vector-label tspan {
+      font-size: 15px;
+      font-style: normal;
+      font-weight: 700;
+    }
+
+    .alpha-label {
+      font-size: 30px;
+      font-style: italic;
+      font-weight: 700;
+      fill: #2c3032;
+      paint-order: stroke fill;
+      stroke: #f7fafb;
+      stroke-width: 5;
+    }
+
+    .alpha-value {
+      font-size: 19px;
+      fill: #37494d;
+      font-weight: 700;
+      paint-order: stroke fill;
+      stroke: #f7fafb;
+      stroke-width: 4;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <h1>Kraftsimulation: Motorrad bei Kurvenfahrt</h1>
+      <p class="subtitle">
+        Die Grafik zeigt die Kraftvektoren am Schwerpunkt: Gewichtskraft <strong>F<sub>G</sub></strong>, Quer-/Zentripetalkraft <strong>F<sub>Z</sub></strong> und die resultierende Kraft <strong>F<sub>Res</sub></strong>.
+        Mit den Reglern kann geprüft werden, ob die eingestellte Schräglage zur Geschwindigkeit passt.
+      </p>
+    </section>
+
+    <section class="layout">
+      <article class="card sim-wrap" aria-label="Simulation">
+        <svg id="simSvg" viewBox="-180 0 1080 620" role="img" aria-label="Motorrad mit Kraftpfeilen in der Kurve">
+          <defs>
+            <marker id="arrowRed" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+              <path d="M0,0 L12,6 L0,12 Z" fill="#e12929"></path>
+            </marker>
+            <marker id="arrowOrange" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+              <path d="M0,0 L12,6 L0,12 Z" fill="#f3a512"></path>
+            </marker>
+            <marker id="arrowBlack" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+              <path d="M0,0 L12,6 L0,12 Z" fill="#800080"></path>
+            </marker>
+          </defs>
+
+          <rect x="-180" y="560" width="1080" height="60" fill="#c9c9cc"></rect>
+          <line x1="-180" y1="560" x2="900" y2="560" stroke="#555" stroke-width="3"></line>
+
+          <g id="bike" transform="translate(340 560) rotate(25)">
+            <image class="bike-image" href="bike.svg" x="-320" y="-349" width="640" height="349" preserveAspectRatio="xMidYMax meet"></image>
+          </g>
+
+          <line id="vertical" x1="440" y1="260" x2="440" y2="560" stroke="#333" stroke-width="2.3" stroke-dasharray="12 9"></line>
+          <line id="bikeAxis" x1="440" y1="260" x2="340" y2="560" stroke="#2b2b2b" stroke-width="5"></line>
+
+          <line id="fz" x1="440" y1="260" x2="320" y2="260" stroke="#e12929" stroke-width="6" marker-end="url(#arrowRed)"></line>
+          <line id="fg" x1="440" y1="260" x2="440" y2="420" stroke="#f3a512" stroke-width="6" marker-end="url(#arrowOrange)"></line>
+          <line id="fres" x1="440" y1="260" x2="320" y2="420" stroke="#800080" stroke-width="6" marker-end="url(#arrowBlack)"></line>
+
+          <text id="labelFz" class="vector-label" text-anchor="middle" x="310" y="240" fill="#e12929">F<tspan baseline-shift="sub">Z</tspan></text>
+          <text id="labelFg" class="vector-label" x="450" y="435" fill="#f3a512">F<tspan baseline-shift="sub">G</tspan></text>
+          <text id="labelFr" class="vector-label" text-anchor="middle" x="315" y="432" fill="#800080">F<tspan baseline-shift="sub">Res</tspan></text>
+
+          <path id="alphaSector" d="" fill="#f7e9a8" fill-opacity="0.68"></path>
+          <path id="alphaArc" d="" fill="none" stroke="#555" stroke-width="2.5"></path>
+          <text id="alphaText" class="alpha-label" x="455" y="320">α</text>
+          <text id="alphaValueText" class="alpha-value" x="472" y="336">35.0°</text>
+
+          <circle id="comOuter" cx="440" cy="260" r="13" fill="#fff" stroke="#222" stroke-width="2"></circle>
+          <path id="comCross" d="M440 247 v26 M427 260 h26" stroke="#222" stroke-width="3"></path>
+
+          <circle cx="340" cy="560" r="4.5" fill="#1f1f1f"></circle>
+        </svg>
+      </article>
+
+      <aside class="card controls" aria-label="Steuerung">
+        <div class="control">
+          <div class="label-line">
+            <strong>Geschwindigkeit</strong>
+            <span id="speedValue">70 km/h</span>
+          </div>
+          <input id="speed" type="range" min="10" max="130" step="1" value="70" aria-label="Geschwindigkeit in Kilometer pro Stunde">
+        </div>
+
+        <div class="control">
+          <div class="label-line">
+            <strong>Schräglage α</strong>
+            <span id="leanValue">35.0°</span>
+          </div>
+          <input id="lean" type="range" min="0" max="70" step="0.5" value="35" aria-label="Schräglage in Grad">
+        </div>
+
+        <div class="facts" aria-live="polite">
+          <div><span>Kurvenradius (fest)</span><span id="radiusValue">45.0 m</span></div>
+          <div><span>Querbeschleunigung a = v²/r</span><span id="aValue">0.00 m/s²</span></div>
+          <div><span>Quer-/Zentripetalkraft F<sub>Z</sub></span><span id="fzValue">0 N</span></div>
+          <div><span>Gewichtskraft F<sub>G</sub></span><span id="fgValue">0 N</span></div>
+          <div><span>Ideale Schräglage α<sub>ideal</sub></span><span id="idealValue">0.0°</span></div>
+        </div>
+
+        <div id="status" class="status warn"></div>
+
+        <div class="legend" aria-hidden="true">
+          <span class="chip"><span class="line-dot" style="background: var(--force-z)"></span>F<sub>Z</sub> horizontal</span>
+          <span class="chip"><span class="line-dot" style="background: var(--force-g)"></span>F<sub>G</sub> nach unten</span>
+          <span class="chip"><span class="line-dot" style="background: var(--force-r)"></span>F<sub>Res</sub> = F<sub>G</sub> + F<sub>Z</sub></span>
+        </div>
+
+        <p class="muted">Modell: <code>tan(α<sub>ideal</sub>) = v² / (r·g)</code>, mit <code>g = 9.81 m/s²</code> und <code>m = 250 kg</code>.</p>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const g = 9.81;
+    const mass = 250;
+    const radius = 45;
+    const contactX = 340;
+    const contactY = 560;
+    const comDistance = 300;
+
+    const speed = document.getElementById("speed");
+    const lean = document.getElementById("lean");
+
+    const speedValue = document.getElementById("speedValue");
+    const leanValue = document.getElementById("leanValue");
+    const radiusValue = document.getElementById("radiusValue");
+    const aValue = document.getElementById("aValue");
+    const fzValue = document.getElementById("fzValue");
+    const fgValue = document.getElementById("fgValue");
+    const idealValue = document.getElementById("idealValue");
+    const status = document.getElementById("status");
+
+    const bike = document.getElementById("bike");
+    const vertical = document.getElementById("vertical");
+    const bikeAxis = document.getElementById("bikeAxis");
+    const alphaSector = document.getElementById("alphaSector");
+    const alphaArc = document.getElementById("alphaArc");
+    const alphaText = document.getElementById("alphaText");
+    const alphaValueText = document.getElementById("alphaValueText");
+
+    const fzLine = document.getElementById("fz");
+    const fgLine = document.getElementById("fg");
+    const frLine = document.getElementById("fres");
+
+    const labelFz = document.getElementById("labelFz");
+    const labelFg = document.getElementById("labelFg");
+    const labelFr = document.getElementById("labelFr");
+
+    const comOuter = document.getElementById("comOuter");
+    const comCross = document.getElementById("comCross");
+
+    function setLine(el, x1, y1, x2, y2) {
+      el.setAttribute("x1", x1.toFixed(2));
+      el.setAttribute("y1", y1.toFixed(2));
+      el.setAttribute("x2", x2.toFixed(2));
+      el.setAttribute("y2", y2.toFixed(2));
+    }
+
+    function setCom(x, y) {
+      comOuter.setAttribute("cx", x.toFixed(2));
+      comOuter.setAttribute("cy", y.toFixed(2));
+      comCross.setAttribute("d", `M${(x).toFixed(2)} ${(y - 13).toFixed(2)} v26 M${(x - 13).toFixed(2)} ${(y).toFixed(2)} h26`);
+    }
+
+    function setArc(cx, cy, radiusPx, startAngle, endAngle) {
+      const x1 = cx + radiusPx * Math.cos(startAngle);
+      const y1 = cy + radiusPx * Math.sin(startAngle);
+      const x2 = cx + radiusPx * Math.cos(endAngle);
+      const y2 = cy + radiusPx * Math.sin(endAngle);
+      const largeArcFlag = Math.abs(endAngle - startAngle) > Math.PI ? 1 : 0;
+      const sweepFlag = endAngle > startAngle ? 1 : 0;
+      alphaArc.setAttribute("d", `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${radiusPx} ${radiusPx} 0 ${largeArcFlag} ${sweepFlag} ${x2.toFixed(2)} ${y2.toFixed(2)}`);
+    }
+
+    function setSector(cx, cy, radiusPx, startAngle, endAngle) {
+      const x1 = cx + radiusPx * Math.cos(startAngle);
+      const y1 = cy + radiusPx * Math.sin(startAngle);
+      const x2 = cx + radiusPx * Math.cos(endAngle);
+      const y2 = cy + radiusPx * Math.sin(endAngle);
+      const largeArcFlag = Math.abs(endAngle - startAngle) > Math.PI ? 1 : 0;
+      const sweepFlag = endAngle > startAngle ? 1 : 0;
+      alphaSector.setAttribute("d", `M ${cx.toFixed(2)} ${cy.toFixed(2)} L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${radiusPx} ${radiusPx} 0 ${largeArcFlag} ${sweepFlag} ${x2.toFixed(2)} ${y2.toFixed(2)} Z`);
+    }
+
+    function update() {
+      const speedKmh = Number(speed.value);
+      const alphaDeg = Number(lean.value);
+      const v = speedKmh / 3.6;
+      const alphaRad = alphaDeg * Math.PI / 180;
+
+      const aSide = (v * v) / radius;
+      const fz = mass * aSide;
+      const fg = mass * g;
+      const ratio = aSide / g;
+
+      const idealRad = Math.atan(ratio);
+      const idealDeg = idealRad * 180 / Math.PI;
+      const diff = alphaDeg - idealDeg;
+
+      const comX = contactX + Math.sin(alphaRad) * comDistance;
+      const comY = contactY - Math.cos(alphaRad) * comDistance;
+
+      bike.setAttribute("transform", `translate(${contactX} ${contactY}) rotate(${alphaDeg.toFixed(2)})`);
+
+      setLine(vertical, comX, comY, comX, contactY);
+      setLine(bikeAxis, comX, comY, contactX, contactY);
+
+      const startAngle = Math.PI / 2;
+      const endAngle = Math.PI / 2 + alphaRad;
+      const arcRadius = alphaDeg < 14 ? 88 : 70;
+      const textRadius = alphaDeg < 12 ? arcRadius + 10 : arcRadius - 12;
+      const midAngle = startAngle + alphaRad / 2;
+      let alphaX = comX + textRadius * Math.cos(midAngle);
+      let alphaY = comY + textRadius * Math.sin(midAngle);
+
+      setSector(comX, comY, arcRadius - 8, startAngle, endAngle);
+      setArc(comX, comY, arcRadius, startAngle, endAngle);
+      if (alphaDeg < 6) {
+        alphaX = comX + 52;
+        alphaY = comY + 70;
+      }
+      alphaText.setAttribute("x", (alphaX - 8).toFixed(2));
+      alphaText.setAttribute("y", (alphaY + 8).toFixed(2));
+      alphaValueText.setAttribute("x", (alphaX + 20).toFixed(2));
+      alphaValueText.setAttribute("y", (alphaY + 12).toFixed(2));
+      alphaValueText.textContent = `${alphaDeg.toFixed(1)}°`;
+
+      const lenGToGround = contactY - comY;
+      const lenZ = lenGToGround * ratio;
+      const endZx = comX - lenZ;
+      const endZy = comY;
+      const endGx = comX;
+      const endGy = contactY;
+      const endRx = comX - lenZ;
+      const endRy = contactY;
+
+      setLine(fzLine, comX, comY, endZx, endZy);
+      setLine(fgLine, comX, comY, endGx, endGy);
+      setLine(frLine, comX, comY, endRx, endRy);
+
+      const midZx = (comX + endZx) / 2;
+      const midGy = (comY + endGy) / 2;
+      const midRx = (comX + endRx) / 2;
+      const midRy = (comY + endRy) / 2;
+      const vecRx = endRx - comX;
+      const vecRy = endRy - comY;
+      const vecRLen = Math.hypot(vecRx, vecRy) || 1;
+      const normRx = -vecRy / vecRLen;
+      const normRy = vecRx / vecRLen;
+
+      labelFz.setAttribute("x", (midZx).toFixed(2));
+      labelFz.setAttribute("y", (endZy - 24).toFixed(2));
+      labelFg.setAttribute("x", (endGx + 24).toFixed(2));
+      labelFg.setAttribute("y", (midGy + 12).toFixed(2));
+      labelFr.setAttribute("x", (midRx + normRx * 30).toFixed(2));
+      labelFr.setAttribute("y", (midRy + normRy * 30 + 11).toFixed(2));
+
+      setCom(comX, comY);
+
+      speedValue.textContent = `${speedKmh.toFixed(0)} km/h`;
+      leanValue.textContent = `${alphaDeg.toFixed(1)}°`;
+      radiusValue.textContent = `${radius.toFixed(1)} m`;
+      aValue.textContent = `${aSide.toFixed(2)} m/s²`;
+      fzValue.textContent = `${fz.toFixed(0)} N`;
+      fgValue.textContent = `${fg.toFixed(0)} N`;
+      idealValue.textContent = `${idealDeg.toFixed(1)}°`;
+
+      if (Math.abs(diff) <= 2) {
+        status.className = "status good";
+        status.textContent = `Nahe am Gleichgewicht: α stimmt gut mit α_ideal überein (Abweichung ${diff.toFixed(1)}°).`;
+      } else if (diff > 2) {
+        status.className = "status warn";
+        status.textContent = `Motorrad ist stärker geneigt als für diese Geschwindigkeit nötig (Abweichung +${diff.toFixed(1)}°).`;
+      } else {
+        status.className = "status warn";
+        status.textContent = `Für diese Geschwindigkeit ist mehr Schräglage nötig (Abweichung ${diff.toFixed(1)}°).`;
+      }
+    }
+
+    speed.addEventListener("input", update);
+    lean.addEventListener("input", update);
+    update();
+  </script>
+</body>
+</html>
