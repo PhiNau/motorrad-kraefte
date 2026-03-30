@@ -62,7 +62,7 @@
       color: var(--muted);
       font-size: 0.97rem;
       line-height: 1.45;
-      max-width: 75ch;
+      max-width: min(100%, 112ch);
     }
 
     .layout {
@@ -183,6 +183,20 @@
       gap: 0.4rem;
     }
 
+    .force-symbol {
+      font-style: italic;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .force-symbol sub {
+      font-size: 0.72em;
+      vertical-align: -0.35em;
+      line-height: 0;
+      font-style: normal;
+      letter-spacing: 0;
+    }
+
     .line-dot {
       width: 18px;
       height: 4px;
@@ -233,6 +247,10 @@
     }
 
     @media (max-width: 980px) {
+      .subtitle {
+        max-width: 75ch;
+      }
+
       .layout {
         grid-template-columns: 1fr;
       }
@@ -244,7 +262,7 @@
     <section class="hero">
       <h1>Kraftsimulation: Motorrad bei Kurvenfahrt</h1>
       <p class="subtitle">
-        Die Grafik zeigt die Kraftvektoren am Schwerpunkt: Gewichtskraft <strong>F<sub>G</sub></strong>, Quer-/Zentripetalkraft <strong>F<sub>Z</sub></strong> und die resultierende Kraft <strong>F<sub>Res</sub></strong>.
+        Die Grafik zeigt die Kraftvektoren am Schwerpunkt: Gewichtskraft <strong class="force-symbol">F<sub>G</sub></strong>, Quer-/Zentripetalkraft <strong class="force-symbol">F<sub>Z</sub></strong> und die resultierende Kraft <strong class="force-symbol">F<sub>Res</sub></strong>.
         Mit den Reglern kann geprüft werden, ob die eingestellte Schräglage zur Geschwindigkeit passt.
       </p>
     </section>
@@ -314,20 +332,20 @@
         <div class="facts" aria-live="polite">
           <div><span>Kurvenradius (fest)</span><span id="radiusValue">45.0 m</span></div>
           <div><span>Querbeschleunigung a = v²/r</span><span id="aValue">0.00 m/s²</span></div>
-          <div><span>Quer-/Zentripetalkraft F<sub>Z</sub></span><span id="fzValue">0 N</span></div>
-          <div><span>Gewichtskraft F<sub>G</sub></span><span id="fgValue">0 N</span></div>
+          <div><span>Quer-/Zentripetalkraft <span class="force-symbol">F<sub>Z</sub></span></span><span id="fzValue">0 N</span></div>
+          <div><span>Gewichtskraft <span class="force-symbol">F<sub>G</sub></span></span><span id="fgValue">0 N</span></div>
           <div><span>Ideale Schräglage α<sub>ideal</sub></span><span id="idealValue">0.0°</span></div>
         </div>
 
         <div id="status" class="status warn"></div>
 
         <div class="legend" aria-hidden="true">
-          <span class="chip"><span class="line-dot" style="background: var(--force-z)"></span>F<sub>Z</sub> horizontal</span>
-          <span class="chip"><span class="line-dot" style="background: var(--force-g)"></span>F<sub>G</sub> nach unten</span>
-          <span class="chip"><span class="line-dot" style="background: var(--force-r)"></span>F<sub>Res</sub> = F<sub>G</sub> + F<sub>Z</sub></span>
+          <span class="chip"><span class="line-dot" style="background: var(--force-z)"></span><span class="force-symbol">F<sub>Z</sub></span> horizontal</span>
+          <span class="chip"><span class="line-dot" style="background: var(--force-g)"></span><span class="force-symbol">F<sub>G</sub></span> nach unten</span>
+          <span class="chip"><span class="line-dot" style="background: var(--force-r)"></span><span class="force-symbol">F<sub>Res</sub></span> = <span class="force-symbol">F<sub>G</sub></span> + <span class="force-symbol">F<sub>Z</sub></span></span>
         </div>
 
-        <p class="muted">Modell: <code>tan(α<sub>ideal</sub>) = v² / (r·g)</code>, mit <code>g = 9.81 m/s²</code> und <code>m = 250 kg</code>.</p>
+        <p class="muted">Modell: <code>tan(α<sub>ideal</sub>) = v² / (r·g)</code>, mit <code>g = 9.81 m/s²</code>, <code>m = 250 kg</code>, <span class="force-symbol">F<sub>G</sub></span> und <span class="force-symbol">F<sub>Z</sub></span>.</p>
       </aside>
     </section>
   </main>
