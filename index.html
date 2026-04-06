@@ -246,12 +246,74 @@
       stroke-width: 4;
     }
 
+    .tasks {
+      background: var(--panel);
+      border: 1px solid #c9d8d7;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(12, 35, 44, 0.08);
+      padding: 1rem;
+    }
+
+    .tasks h2 {
+      margin: 0;
+      font-size: 1.15rem;
+      letter-spacing: 0.2px;
+    }
+
+    .tasks-intro {
+      margin: 0.35rem 0 0.8rem;
+      color: var(--muted);
+      font-size: 0.94rem;
+      line-height: 1.4;
+    }
+
+    .task-grid {
+      display: grid;
+      gap: 0.8rem;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .task-item {
+      border: 1px solid #d4dfde;
+      border-radius: 12px;
+      background: #f8fbfa;
+      padding: 0.8rem;
+    }
+
+    .task-item h3 {
+      margin: 0 0 0.45rem;
+      font-size: 1rem;
+    }
+
+    .task-goal {
+      margin: 0 0 0.45rem;
+      font-size: 0.92rem;
+      line-height: 1.35;
+      color: #223539;
+    }
+
+    .task-item ol {
+      margin: 0;
+      padding-left: 1.2rem;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      color: #25373c;
+    }
+
+    .task-item li + li {
+      margin-top: 0.28rem;
+    }
+
     @media (max-width: 980px) {
       .subtitle {
         max-width: 75ch;
       }
 
       .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .task-grid {
         grid-template-columns: 1fr;
       }
     }
@@ -347,6 +409,43 @@
 
         <p class="muted">Modell: <code>tan(α<sub>ideal</sub>) = v² / (r·g)</code>, mit <code>g = 9.81 m/s²</code>, <code>m = 250 kg</code>, <span class="force-symbol">F<sub>G</sub></span> und <span class="force-symbol">F<sub>Z</sub></span>.</p>
       </aside>
+    </section>
+
+    <section class="tasks" aria-label="Aufgaben für den Unterricht">
+      <h2>Aufgaben für die Kurvenfahrt-Analyse</h2>
+      <p class="tasks-intro">Bearbeitet jede Aufgabe mit der Simulation und notiert eure Ergebnisse nachvollziehbar (Werte, Beobachtung, kurze Begründung).</p>
+
+      <div class="task-grid">
+        <article class="task-item">
+          <h3>Aufgabe 1: Gleichgewicht finden</h3>
+          <p class="task-goal"><strong>Ziel:</strong> Für drei Geschwindigkeiten die passende Schräglage bestimmen, bei der die Statusmeldung "Nahe am Gleichgewicht" zeigt.</p>
+          <ol>
+            <li>Stellt nacheinander 40 km/h, 70 km/h und 100 km/h ein.</li>
+            <li>Regelt jeweils die Schräglage, bis die Abweichung möglichst klein ist.</li>
+            <li>Gebt die drei Wertepaare (v, α) und die jeweilige Restabweichung an.</li>
+          </ol>
+        </article>
+
+        <article class="task-item">
+          <h3>Aufgabe 2: Einfluss der Geschwindigkeit</h3>
+          <p class="task-goal"><strong>Ziel:</strong> Den Zusammenhang zwischen Geschwindigkeit und Quer-/Zentripetalkraft <span class="force-symbol">F<sub>Z</sub></span> untersuchen.</p>
+          <ol>
+            <li>Wählt eine feste Schräglage von 35 Grad.</li>
+            <li>Messt bei 30, 60, 90 und 120 km/h den Wert von <span class="force-symbol">F<sub>Z</sub></span>.</li>
+            <li>Erklärt in 2-3 Sätzen, warum <span class="force-symbol">F<sub>Z</sub></span> so stark mit der Geschwindigkeit wächst.</li>
+          </ol>
+        </article>
+
+        <article class="task-item">
+          <h3>Aufgabe 3: Risiko Abschätzen</h3>
+          <p class="task-goal"><strong>Ziel:</strong> Kritische Situationen erkennen, in denen die eingestellte Schräglage nicht mehr zur Geschwindigkeit passt.</p>
+          <ol>
+            <li>Startet bei 50 km/h und 25 Grad und erhöht nur die Geschwindigkeit in 10er-Schritten.</li>
+            <li>Notiert, ab welchem Wert die Statusmeldung anzeigt, dass mehr Schräglage nötig ist.</li>
+            <li>Formuliert eine Regel für sicheres Anpassen von Geschwindigkeit und Schräglage in Kurven.</li>
+          </ol>
+        </article>
+      </div>
     </section>
   </main>
 
