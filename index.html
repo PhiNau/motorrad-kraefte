@@ -270,7 +270,7 @@
     .task-grid {
       display: grid;
       gap: 0.8rem;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     }
 
     .task-item {
@@ -451,6 +451,16 @@
             <li>Startet bei 50 km/h und 25 Grad und erhöht nur die Geschwindigkeit in 10er-Schritten.</li>
             <li>Notiert, ab welchem Wert die Statusmeldung anzeigt, dass mehr Schräglage nötig ist.</li>
             <li>Formuliert eine Regel für sicheres Anpassen von Geschwindigkeit und Schräglage in Kurven.</li>
+          </ol>
+        </article>
+
+        <article class="task-item">
+          <h3>Aufgabe 4: Geschwindigkeit des "heftigen Typs"</h3>
+          <p class="task-goal"><strong>Ziel:</strong> Die Geschwindigkeit eines Fahrers bestimmen, der mit ca. 40-45 Grad Schräglage durch eine Kurve mit Radius 17 m fährt.</p>
+          <ol>
+            <li>Stellt den Kurvenradius auf 17 m ein.</li>
+            <li>Sucht die Geschwindigkeiten, bei denen die ideale Schräglage α<sub>ideal</sub> einmal bei ca. 40 Grad und einmal bei ca. 45 Grad liegt.</li>
+            <li>Gebt das gesuchte Geschwindigkeitsintervall in km/h an und begründet kurz, warum es ein Bereich und kein Einzelwert ist.</li>
           </ol>
         </article>
       </div>
