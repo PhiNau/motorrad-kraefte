@@ -1,0 +1,1324 @@
+﻿<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dexter Mission: Orbit Zur Mondroute</title>
+  <style>
+    :root {
+      --bg-a: #040918;
+      --bg-b: #0b1730;
+      --card: #101d36;
+      --line: #2a436f;
+      --ink: #e7efff;
+      --muted: #b4c4e7;
+      --good: #8de7b0;
+      --warn: #ffd18c;
+      --bad: #ff9ea6;
+      --accent: #6fc8ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Bahnschrift", "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 450px at 85% -10%, #1c3560 0%, transparent 58%),
+        linear-gradient(180deg, var(--bg-a), var(--bg-b));
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 1rem;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.28);
+      overflow: hidden;
+    }
+
+    .hero {
+      padding: 1rem 1.1rem;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      letter-spacing: 0.25px;
+    }
+
+    h1 {
+      font-size: clamp(1.15rem, 2.2vw, 1.7rem);
+    }
+
+    .subtitle {
+      margin: 0.45rem 0 0;
+      line-height: 1.45;
+      color: var(--muted);
+      max-width: 105ch;
+      font-size: 0.97rem;
+    }
+
+    .story {
+      padding: 0.9rem;
+      display: grid;
+      gap: 0.7rem;
+    }
+
+    .story-scene {
+      position: relative;
+      min-height: 310px;
+      border-radius: 12px;
+      border: 1px solid #365384;
+      background:
+        radial-gradient(900px 260px at 50% 115%, #2b4f8b 0%, #17315f 48%, #0b1b37 100%);
+      overflow: hidden;
+    }
+
+    .story-scene::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,0.85) 0 1px, transparent 2px),
+        radial-gradient(circle at 32% 64%, rgba(255,255,255,0.75) 0 1px, transparent 2px),
+        radial-gradient(circle at 58% 12%, rgba(255,255,255,0.75) 0 1px, transparent 2px),
+        radial-gradient(circle at 85% 34%, rgba(255,255,255,0.8) 0 1px, transparent 2px),
+        radial-gradient(circle at 72% 76%, rgba(255,255,255,0.7) 0 1px, transparent 2px);
+      opacity: 0.65;
+      pointer-events: none;
+    }
+
+    .character,
+    .story-rocket {
+      position: absolute;
+      bottom: 12px;
+      object-fit: contain;
+      transform-origin: 50% 100%;
+      user-select: none;
+      pointer-events: none;
+      filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.45));
+      transition: transform 1.2s ease, opacity 1.2s ease;
+    }
+
+    #dexterSprite {
+      left: 4%;
+      width: min(250px, 28vw);
+      height: 280px;
+    }
+
+    #deedeeSprite {
+      left: 29%;
+      width: min(210px, 25vw);
+      height: 250px;
+    }
+
+    #storyRocket {
+      right: 6%;
+      width: min(340px, 36vw);
+      height: 190px;
+      opacity: 0.45;
+      transform: translateY(20px) scale(0.95);
+    }
+
+    #storyRocket.ready {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    #storyRocket.launch-ready {
+      animation: rocket-hover 1.3s ease-in-out infinite;
+    }
+
+    #deedeeSprite.boarding {
+      transform: translate(278px, 2px) scale(0.52);
+      opacity: 0;
+    }
+
+    #dexterSprite.talking,
+    #deedeeSprite.talking {
+      animation: bicker 0.42s ease-in-out infinite alternate;
+    }
+
+    .speech {
+      position: absolute;
+      left: 50%;
+      top: 12px;
+      transform: translateX(-50%);
+      max-width: 84%;
+      padding: 0.6rem 0.8rem;
+      border-radius: 12px;
+      border: 1px solid #3f5f95;
+      background: rgba(8, 23, 46, 0.78);
+      color: #edf5ff;
+      font-size: 0.96rem;
+      line-height: 1.35;
+      text-align: center;
+      backdrop-filter: blur(3px);
+    }
+
+    .story-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      align-items: center;
+    }
+
+    button {
+      border: 1px solid #5681bf;
+      background: linear-gradient(180deg, #1f4e86, #163c66);
+      color: #eef6ff;
+      border-radius: 10px;
+      padding: 0.45rem 0.75rem;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button:hover {
+      filter: brightness(1.08);
+    }
+
+    button:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+      filter: none;
+    }
+
+    .story-state {
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    .mission {
+      padding: 0.85rem;
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    .sim-wrap {
+      border: 1px solid #355482;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #070f21;
+    }
+
+    #orbitCanvas,
+    #mission2Canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: 560px;
+      background: radial-gradient(1200px 560px at 50% 15%, #0e2142 0%, #071329 70%);
+    }
+
+    .mission2-grid {
+      display: grid;
+      gap: 0.7rem;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+
+    .control-line strong.value {
+      font-size: 1.03rem;
+      color: #f1f7ff;
+    }
+
+    .control-grid {
+      display: grid;
+      gap: 0.7rem;
+      grid-template-columns: minmax(0, 1.3fr) minmax(220px, 0.55fr) minmax(220px, 0.55fr);
+    }
+
+    .control-card {
+      border: 1px solid #2f4a76;
+      border-radius: 12px;
+      background: #0c1b34;
+      padding: 0.75rem;
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .control-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      align-items: baseline;
+      font-size: 0.95rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .mission-msg {
+      margin: 0;
+      border: 1px solid #395989;
+      border-radius: 12px;
+      background: #0f203f;
+      padding: 0.55rem 0.7rem;
+      font-size: 0.94rem;
+      line-height: 1.35;
+      color: #e8f1ff;
+    }
+
+    .mission-msg.good {
+      border-color: #4d8f68;
+      background: #122e20;
+      color: var(--good);
+    }
+
+    .mission-msg.warn {
+      border-color: #b18647;
+      background: #3b2a14;
+      color: var(--warn);
+    }
+
+    .mission-msg.bad {
+      border-color: #a55a64;
+      background: #3a1a21;
+      color: var(--bad);
+    }
+
+    .mission-list {
+      margin: 0;
+      padding-left: 1rem;
+      color: #d6e4ff;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .formula-list {
+      margin: 0;
+      padding-left: 1rem;
+      color: #d6e4ff;
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .radius-readout {
+      margin: 0;
+      padding: 0.55rem 0.65rem;
+      border-radius: 10px;
+      border: 1px solid #3b5e95;
+      background: #0a1830;
+      color: #eef5ff;
+      font-size: 0.93rem;
+      line-height: 1.35;
+    }
+
+    .radius-readout strong {
+      font-size: 1.02rem;
+      letter-spacing: 0.15px;
+    }
+
+    @keyframes bicker {
+      from { transform: rotate(-1.6deg); }
+      to { transform: rotate(1.6deg); }
+    }
+
+    @keyframes rocket-hover {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-8px) scale(1.01); }
+    }
+
+    @media (max-width: 980px) {
+      .control-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .mission2-grid {
+        grid-template-columns: 1fr;
+      }
+
+      #deedeeSprite.boarding {
+        transform: translate(215px, 2px) scale(0.52);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="card hero">
+      <h1>Dexter Mission: Stabile Kreisbahn Vor Dem Mondflug</h1>
+      <p class="subtitle">
+        Dexter will seine Ruhe im Labor haben und schickt seine Schwester Nina auf Mondkurs.
+        Eure erste Missionsetappe ist ein stabiler Orbit um die Erde. Mit dem Schieberegler stellt ihr die Startgeschwindigkeit ein. Veraendert ihr den Wert, wird die Flugbahn direkt neu berechnet. Findet die passende Einstellung, damit die Rakete weder abstuerzt noch entkommt, sondern stabil um die Erde kreist. Viel Erfolg, Astronauten!
+      </p>
+    </section>
+
+    <section class="card story" aria-label="Story-Sequenz">
+      <h2>Story-Sequenz</h2>
+      <div class="story-scene" id="storyScene">
+        <img id="dexterSprite" class="character" src="img/dexter.png" alt="Dexter">
+        <img id="deedeeSprite" class="character" src="img/deedee.png" alt="DeeDee">
+        <img id="storyRocket" class="story-rocket" src="img/rocket.png" alt="Rakete">
+        <div id="speechBubble" class="speech">Story optional: Ihr koennt die Mission sofort starten.</div>
+      </div>
+      <div class="story-actions">
+        <button id="startStoryBtn" type="button">Story starten</button>
+        <span id="storyState" class="story-state">Story optional. Mission ist direkt verfuegbar.</span>
+      </div>
+    </section>
+
+    <section class="card mission" aria-label="Orbit-Simulation">
+      <h2>Mission 1: Stabile Erdumlaufbahn</h2>
+      <div class="sim-wrap">
+        <canvas id="orbitCanvas" width="920" height="560"></canvas>
+      </div>
+
+      <div class="control-grid">
+        <div class="control-card">
+          <div class="control-line">
+            <strong>Startschub / Geschwindigkeit</strong>
+            <span id="thrustValue">3.00 km/s</span>
+          </div>
+          <input id="thrustSlider" type="range" min="1.5" max="12.0" step="0.05" value="3.0" aria-label="Startgeschwindigkeit in Kilometer pro Sekunde">
+          <div class="control-line">
+            <span>Eingestellte Startgeschwindigkeit</span>
+            <span id="speedValue"></span>
+          </div>
+          <div class="story-actions">
+            <button id="launchBtn" type="button">Rakete starten</button>
+            <button id="resetBtn" type="button">Zuruecksetzen</button>
+          </div>
+        </div>
+
+        <div class="control-card">
+          <h3>Arbeitsauftrag Etappe 1</h3>
+          <ol class="mission-list">
+            <li>Findet einen stabilen Orbit ohne Absturz oder Flucht.</li>
+            <li>Notiert die benoetigte Startgeschwindigkeit in km/s.</li>
+            <li>Bestimmt bei stabiler Umlaufbahn den Abstand r zum Erdmittelpunkt und berechnet die Zentripetalbeschleunigung a<sub>z</sub> = v<sup>2</sup>/r.</li>
+            <li>Vergleicht: zu niedrig (Crash), zu hoch (Escape), passend (Orbit).</li>
+          </ol>
+        </div>
+
+        <div class="control-card">
+          <h3>Formeln & Bahnradius</h3>
+          <ul class="formula-list">
+            <li>F<sub>z</sub> = m * v<sup>2</sup> / r</li>
+            <li>a<sub>z</sub> = v<sup>2</sup> / r</li>
+          </ul>
+          <p class="radius-readout">
+            Aktueller Abstand zum Erdmittelpunkt:<br>
+            <strong id="radiusValue">9.064.385 m</strong>
+            <br>
+            Gravitationsbeschleunigung in dieser Hoehe:<br>
+            <strong id="gravityValue">4,85 m/s<sup>2</sup></strong>
+            <br>
+            (Berechnung am markierten Mittelpunkt der Rakete)
+          </p>
+        </div>
+      </div>
+
+      <p id="missionMsg" class="mission-msg warn">Startschub einstellen und Rakete starten. Die Story kann optional abgespielt werden.</p>
+    </section>
+
+    <section class="card mission" aria-label="Mondtransfer-Simulation">
+      <h2>Mission 2: Erde-Mond-Erde Transfer</h2>
+      <div class="sim-wrap">
+        <canvas id="mission2Canvas" width="920" height="560"></canvas>
+      </div>
+
+      <div class="mission2-grid">
+        <div class="control-card">
+          <div class="control-line">
+            <span>Aktuelle Geschwindigkeit</span>
+            <strong id="m2SpeedValue" class="value">0.00 km/s</strong>
+          </div>
+          <div class="control-line">
+            <span>Gesamtes Delta-v</span>
+            <strong id="m2DeltaVValue" class="value">0.00 km/s</strong>
+          </div>
+          <div class="control-line">
+            <span>Flugphase</span>
+            <strong id="m2PhaseValue" class="value">Bereit</strong>
+          </div>
+          <div class="story-actions">
+            <button id="m2StartBtn" type="button">Mission 2 starten</button>
+            <button id="m2ResetBtn" type="button">Mission 2 reset</button>
+            <button id="m2BurnPlusBtn" type="button">Beschleunigen +</button>
+            <button id="m2BurnMinusBtn" type="button">Bremsen -</button>
+          </div>
+        </div>
+
+        <div class="control-card">
+          <h3>Arbeitsauftrag Etappe 2</h3>
+          <ol class="mission-list">
+            <li>Startet aus dem Erdorbit und gebt mit <strong>Beschleunigen</strong> einen Transferimpuls Richtung Mond.</li>
+            <li>Bremst am Mond so, dass mindestens eine Mondumrundung gelingt.</li>
+            <li>Gebt danach erneut Schub, um zur Erde zurueckzukehren und wieder eine gebundene Bahn zu erreichen.</li>
+          </ol>
+        </div>
+      </div>
+
+      <p id="m2Msg" class="mission-msg warn">Mission 2 bereit: Startet die Rakete im Erdorbit und steuert per Beschleunigen/Bremsen.</p>
+    </section>
+  </main>
+
+  <script>
+    const storyScene = document.getElementById("storyScene");
+    const dexterSprite = document.getElementById("dexterSprite");
+    const deedeeSprite = document.getElementById("deedeeSprite");
+    const storyRocket = document.getElementById("storyRocket");
+    const speechBubble = document.getElementById("speechBubble");
+    const storyState = document.getElementById("storyState");
+    const startStoryBtn = document.getElementById("startStoryBtn");
+
+    const thrustSlider = document.getElementById("thrustSlider");
+    const thrustValue = document.getElementById("thrustValue");
+    const speedValue = document.getElementById("speedValue");
+    const radiusValue = document.getElementById("radiusValue");
+    const gravityValue = document.getElementById("gravityValue");
+    const launchBtn = document.getElementById("launchBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const missionMsg = document.getElementById("missionMsg");
+    const m2SpeedValue = document.getElementById("m2SpeedValue");
+    const m2DeltaVValue = document.getElementById("m2DeltaVValue");
+    const m2PhaseValue = document.getElementById("m2PhaseValue");
+    const m2StartBtn = document.getElementById("m2StartBtn");
+    const m2ResetBtn = document.getElementById("m2ResetBtn");
+    const m2BurnPlusBtn = document.getElementById("m2BurnPlusBtn");
+    const m2BurnMinusBtn = document.getElementById("m2BurnMinusBtn");
+    const m2Msg = document.getElementById("m2Msg");
+
+    const canvas = document.getElementById("orbitCanvas");
+    const ctx = canvas.getContext("2d");
+    const mission2Canvas = document.getElementById("mission2Canvas");
+    const m2ctx = mission2Canvas.getContext("2d");
+
+    const earthImg = new Image();
+    const rocketImg = new Image();
+    const moonImg = new Image();
+    const imageBounds = {
+      earth: null,
+      rocket: null,
+      moon: null
+    };
+
+    function calculateOpaqueBounds(img) {
+      if (!img.naturalWidth || !img.naturalHeight) {
+        return null;
+      }
+
+      const offscreen = document.createElement("canvas");
+      offscreen.width = img.naturalWidth;
+      offscreen.height = img.naturalHeight;
+      const offCtx = offscreen.getContext("2d", { willReadFrequently: true });
+      offCtx.drawImage(img, 0, 0);
+
+      const data = offCtx.getImageData(0, 0, offscreen.width, offscreen.height).data;
+      let minX = offscreen.width;
+      let minY = offscreen.height;
+      let maxX = -1;
+      let maxY = -1;
+
+      for (let y = 0; y < offscreen.height; y += 1) {
+        const rowOffset = y * offscreen.width * 4;
+        for (let x = 0; x < offscreen.width; x += 1) {
+          const alpha = data[rowOffset + x * 4 + 3];
+          if (alpha > 14) {
+            minX = Math.min(minX, x);
+            minY = Math.min(minY, y);
+            maxX = Math.max(maxX, x);
+            maxY = Math.max(maxY, y);
+          }
+        }
+      }
+
+      if (maxX < minX || maxY < minY) {
+        return null;
+      }
+
+      return {
+        sx: minX,
+        sy: minY,
+        sw: maxX - minX + 1,
+        sh: maxY - minY + 1
+      };
+    }
+
+    earthImg.addEventListener("load", () => {
+      imageBounds.earth = calculateOpaqueBounds(earthImg);
+      drawScene();
+      drawMission2();
+    });
+    rocketImg.addEventListener("load", () => {
+      imageBounds.rocket = calculateOpaqueBounds(rocketImg);
+      drawScene();
+      drawMission2();
+    });
+    moonImg.addEventListener("load", () => {
+      imageBounds.moon = calculateOpaqueBounds(moonImg);
+      drawMission2();
+    });
+
+    earthImg.src = "img/BluePlanet.svg";
+    rocketImg.src = "img/rocket.svg";
+    moonImg.src = "img/moon.png";
+
+    const starField = Array.from({ length: 120 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.7 + 0.35,
+      a: Math.random() * 0.8 + 0.2
+    }));
+
+    const sim = {
+      running: false,
+      finished: false,
+      stableReported: false,
+      t: 0,
+      x: 0,
+      y: 0,
+      vx: 0,
+      vy: 0,
+      minR: Infinity,
+      maxR: 0,
+      trail: []
+    };
+
+    const constants = {
+      centerX: canvas.width / 2,
+      centerY: canvas.height / 2,
+      earthRadius: 118,
+      earthRadiusMeters: 6371000,
+      earthGravitySurface: 9.81,
+      startAltitude: 55,
+      mu: 19500,
+      escapeRadius: 500,
+      stableCheckTime: 26,
+      simSpeedFactor: 4.8,
+      integrationStep: 0.012
+    };
+
+    let storyDone = false;
+    let deedeeBoarded = false;
+    const storyStepPauseMs = 900;
+    let lastFrame = performance.now();
+    const m2StarField = Array.from({ length: 150 }, () => ({
+      x: Math.random() * mission2Canvas.width,
+      y: Math.random() * mission2Canvas.height,
+      r: Math.random() * 1.7 + 0.35,
+      a: Math.random() * 0.8 + 0.18
+    }));
+    const m2 = {
+      running: false,
+      finished: false,
+      x: 0,
+      y: 0,
+      vx: 0,
+      vy: 0,
+      trail: [],
+      deltaV: 0,
+      phaseId: 0,
+      moonAnglePrev: null,
+      moonAngleAccum: 0
+    };
+    const m2Constants = {
+      earthX: mission2Canvas.width * 0.27,
+      earthY: mission2Canvas.height * 0.52,
+      earthRadius: 74,
+      moonX: mission2Canvas.width * 0.79,
+      moonY: mission2Canvas.height * 0.52,
+      moonRadius: 30,
+      startOrbitR: 124,
+      muEarth: 17000,
+      muMoon: 800,
+      moonCaptureRadius: 165,
+      moonOrbitMin: 68,
+      moonOrbitMax: 108,
+      earthReturnMin: 96,
+      earthReturnMax: 150,
+      simSpeedFactor: 3.5,
+      integrationStep: 0.0135,
+      burnPlus: 0.31,
+      burnMinus: 0.24,
+      escapeRadius: 980
+    };
+
+    const storySteps = [
+      { text: "Dexter: Nina, bitte stoer mein Labor nicht dauernd!", speaker: "dexter", ms: 2700 },
+      { text: "Nina: Ich mache, was ich will!", speaker: "deedee", ms: 2600 },
+      { text: "Dexter: Wie waere es mit einer Reise zum Mond?", speaker: "dexter", ms: 2900, rocketReady: true },
+      { text: "Dexter steckt Nina in die Rakete...", speaker: "none", ms: 3100, board: true, rocketReady: true },
+      { text: "Mission frei: Stellt den Startschub so ein, dass Nina stabil um die Erde kreist.", speaker: "none", ms: 0, complete: true, rocketReady: true }
+    ];
+
+    function setMissionMessage(text, kind) {
+      missionMsg.className = `mission-msg ${kind}`;
+      missionMsg.textContent = text;
+    }
+
+    function setMission2Message(text, kind) {
+      m2Msg.className = `mission-msg ${kind}`;
+      m2Msg.textContent = text;
+    }
+
+    function updateSpeedDisplay() {
+      const launchKmS = Number(thrustSlider.value);
+      thrustValue.textContent = `${launchKmS.toFixed(2)} km/s`;
+      speedValue.textContent = `${launchKmS.toFixed(2)} km/s`;
+    }
+
+    function updateRadiusDisplay() {
+      const currentR = Math.hypot(sim.x, sim.y);
+      const radiusMetersRaw = currentR * (constants.earthRadiusMeters / constants.earthRadius);
+      const radiusMeters = Math.max(radiusMetersRaw, constants.earthRadiusMeters);
+      const gravityAtR = constants.earthGravitySurface * Math.pow(constants.earthRadiusMeters / radiusMeters, 2);
+      radiusValue.textContent = `${Math.round(radiusMeters).toLocaleString("de-DE")} m`;
+      gravityValue.innerHTML = `${gravityAtR.toFixed(2).replace(".", ",")} m/s<sup>2</sup>`;
+    }
+
+    function resetStoryVisuals(options = {}) {
+      const keepBoarding = options.keepBoarding === true;
+      dexterSprite.classList.remove("talking");
+      deedeeSprite.classList.remove("talking");
+      if (!keepBoarding) {
+        deedeeSprite.classList.remove("boarding");
+      }
+      storyRocket.classList.remove("ready", "launch-ready");
+    }
+
+    function runStoryStep(index) {
+      if (index >= storySteps.length) {
+        return;
+      }
+
+      const step = storySteps[index];
+      resetStoryVisuals({ keepBoarding: deedeeBoarded });
+
+      if (step.speaker === "dexter") {
+        dexterSprite.classList.add("talking");
+      }
+      if (step.speaker === "deedee") {
+        deedeeSprite.classList.add("talking");
+      }
+      if (step.rocketReady) {
+        storyRocket.classList.add("ready");
+      }
+      if (step.board) {
+        deedeeBoarded = true;
+        deedeeSprite.classList.add("boarding");
+      }
+
+      speechBubble.textContent = step.text;
+
+      if (step.complete) {
+        storyDone = true;
+        storyRocket.classList.add("launch-ready");
+        storyState.textContent = "Story abgeschlossen. Mission bleibt verfuegbar.";
+        setMissionMessage("Etappe 1: Findet einen stabilen Orbit. Zu langsam = Absturz, zu schnell = Escape.", "warn");
+        startStoryBtn.disabled = false;
+        startStoryBtn.textContent = "Story erneut starten";
+        return;
+      }
+
+      setTimeout(() => runStoryStep(index + 1), step.ms + storyStepPauseMs);
+    }
+
+    function startStory() {
+      storyDone = false;
+      deedeeBoarded = false;
+      resetStoryVisuals({ keepBoarding: false });
+      startStoryBtn.disabled = true;
+      storyState.textContent = "Story laeuft...";
+      setMissionMessage("Story laeuft parallel. Die Orbit-Mission ist weiterhin direkt nutzbar.", "warn");
+      runStoryStep(0);
+    }
+
+    function resetSimState() {
+      sim.running = false;
+      sim.finished = false;
+      sim.stableReported = false;
+      sim.t = 0;
+      sim.trail = [];
+      const startR = constants.earthRadius + constants.startAltitude;
+      sim.x = 0;
+      sim.y = -startR;
+      sim.vx = 0;
+      sim.vy = 0;
+      sim.minR = startR;
+      sim.maxR = startR;
+      updateRadiusDisplay();
+      drawScene();
+    }
+
+    function startLaunch(options = {}) {
+      const fromSlider = options.fromSlider === true;
+
+      const startR = constants.earthRadius + constants.startAltitude;
+      const circularSpeed = Math.sqrt(constants.mu / startR);
+      const launchKmS = Number(thrustSlider.value);
+      const circularSpeedKmS = 7.8;
+      const launchSpeed = circularSpeed * (launchKmS / circularSpeedKmS);
+
+      sim.running = true;
+      sim.finished = false;
+      sim.stableReported = false;
+      sim.t = 0;
+      sim.trail = [];
+      sim.x = 0;
+      sim.y = -startR;
+      sim.vx = launchSpeed;
+      sim.vy = 0;
+      sim.minR = startR;
+      sim.maxR = startR;
+      updateRadiusDisplay();
+
+      if (fromSlider) {
+        setMissionMessage("Schub geaendert: Bahn wurde neu berechnet.", "warn");
+      } else {
+        setMissionMessage("Rakete gestartet. Beobachtet die Bahn.", "warn");
+      }
+    }
+
+    function finishMission(kind) {
+      if (kind === "stable") {
+        if (!sim.stableReported) {
+          sim.stableReported = true;
+          setMissionMessage("Ziel erreicht: Stabiler Orbit! Etappe 1 bestanden.", "good");
+        }
+        return;
+      }
+
+      sim.running = false;
+      sim.finished = true;
+
+      if (kind === "crash") {
+        setMissionMessage("Zu langsam: Die Rakete verliert Hoehe und stuerzt auf die Erde.", "bad");
+        return;
+      }
+
+      if (kind === "escape") {
+        setMissionMessage("Zu schnell: Die Rakete erreicht Fluchtbahn und entweicht dem Erdorbit.", "bad");
+        return;
+      }
+
+      setMissionMessage("Gebundene, aber instabile Bahn. Feinschliff beim Schub noetig.", "warn");
+    }
+
+    function stepSimulation(dt) {
+      if (!sim.running) {
+        return;
+      }
+
+      const r = Math.hypot(sim.x, sim.y);
+      const invR3 = 1 / Math.max(r * r * r, 1);
+      const ax = -constants.mu * sim.x * invR3;
+      const ay = -constants.mu * sim.y * invR3;
+
+      sim.vx += ax * dt;
+      sim.vy += ay * dt;
+      sim.x += sim.vx * dt;
+      sim.y += sim.vy * dt;
+      sim.t += dt;
+
+      const newR = Math.hypot(sim.x, sim.y);
+      sim.minR = Math.min(sim.minR, newR);
+      sim.maxR = Math.max(sim.maxR, newR);
+
+      sim.trail.push({ x: sim.x, y: sim.y });
+      if (sim.trail.length > 900) {
+        sim.trail.shift();
+      }
+
+      if (newR <= constants.earthRadius) {
+        const safeR = Math.max(newR, 1e-9);
+        const surfaceScale = constants.earthRadius / safeR;
+        sim.x *= surfaceScale;
+        sim.y *= surfaceScale;
+        finishMission("crash");
+        return;
+      }
+
+      if (newR >= constants.escapeRadius) {
+        finishMission("escape");
+        return;
+      }
+
+      if (sim.t >= constants.stableCheckTime && !sim.stableReported) {
+        const radialSpan = sim.maxR - sim.minR;
+        if (radialSpan < 42) {
+          finishMission("stable");
+        } else {
+          finishMission("unstable");
+        }
+      }
+    }
+
+    function drawRocket(px, py, vx, vy) {
+      const rocketBounds = imageBounds.rocket;
+      const sourceW = rocketBounds ? rocketBounds.sw : rocketImg.naturalWidth;
+      const sourceH = rocketBounds ? rocketBounds.sh : rocketImg.naturalHeight;
+      const aspect = (sourceW > 0 && sourceH > 0) ? sourceW / sourceH : 1.5;
+      const w = 92;
+      const h = w / aspect;
+      const heading = Math.atan2(vy, vx);
+      const spriteForwardOffset = Math.PI / 4;
+
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.rotate(heading + spriteForwardOffset);
+      if (rocketBounds) {
+        ctx.drawImage(
+          rocketImg,
+          rocketBounds.sx,
+          rocketBounds.sy,
+          rocketBounds.sw,
+          rocketBounds.sh,
+          -w / 2,
+          -h / 2,
+          w,
+          h
+        );
+      } else {
+        ctx.drawImage(rocketImg, -w / 2, -h / 2, w, h);
+      }
+      ctx.restore();
+
+      ctx.save();
+      ctx.strokeStyle = "#f3f7ff";
+      ctx.fillStyle = "#0b1a34";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(px, py, 4.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(px - 6.5, py);
+      ctx.lineTo(px + 6.5, py);
+      ctx.moveTo(px, py - 6.5);
+      ctx.lineTo(px, py + 6.5);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawScene() {
+      const { centerX, centerY, earthRadius } = constants;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (const star of starField) {
+        ctx.fillStyle = `rgba(220, 233, 255, ${star.a})`;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.strokeStyle = "rgba(137, 184, 255, 0.22)";
+      ctx.setLineDash([8, 8]);
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, earthRadius + constants.startAltitude, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      if (earthImg.complete) {
+        const earthBounds = imageBounds.earth;
+        if (earthBounds) {
+          ctx.drawImage(
+            earthImg,
+            earthBounds.sx,
+            earthBounds.sy,
+            earthBounds.sw,
+            earthBounds.sh,
+            centerX - earthRadius,
+            centerY - earthRadius,
+            earthRadius * 2,
+            earthRadius * 2
+          );
+        } else {
+          ctx.drawImage(earthImg, centerX - earthRadius, centerY - earthRadius, earthRadius * 2, earthRadius * 2);
+        }
+      } else {
+        ctx.fillStyle = "#2f6fb2";
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, earthRadius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      if (sim.trail.length > 1) {
+        ctx.strokeStyle = "rgba(117, 208, 255, 0.65)";
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        const first = sim.trail[0];
+        ctx.moveTo(centerX + first.x, centerY + first.y);
+        for (let i = 1; i < sim.trail.length; i += 1) {
+          const p = sim.trail[i];
+          ctx.lineTo(centerX + p.x, centerY + p.y);
+        }
+        ctx.stroke();
+      }
+
+      drawRocket(centerX + sim.x, centerY + sim.y, sim.vx, sim.vy);
+      updateRadiusDisplay();
+    }
+
+    function getMission2PhaseLabel(phaseId) {
+      if (phaseId === 0) return "Erdorbit";
+      if (phaseId === 1) return "Transfer zum Mond";
+      if (phaseId === 2) return "Mondorbit";
+      if (phaseId === 3) return "Ruecktransfer zur Erde";
+      if (phaseId === 4) return "Mission geschafft";
+      return "Bereit";
+    }
+
+    function updateMission2Readouts() {
+      const speed = Math.hypot(m2.vx, m2.vy);
+      m2SpeedValue.textContent = `${speed.toFixed(2)} km/s`;
+      m2DeltaVValue.textContent = `${m2.deltaV.toFixed(2)} km/s`;
+      m2PhaseValue.textContent = getMission2PhaseLabel(m2.phaseId);
+    }
+
+    function resetMission2State() {
+      const tangentialSpeed = Math.sqrt(m2Constants.muEarth / m2Constants.startOrbitR);
+      m2.running = false;
+      m2.finished = false;
+      m2.deltaV = 0;
+      m2.phaseId = 0;
+      m2.moonAnglePrev = null;
+      m2.moonAngleAccum = 0;
+      m2.trail = [];
+      m2.x = m2Constants.earthX;
+      m2.y = m2Constants.earthY - m2Constants.startOrbitR;
+      m2.vx = tangentialSpeed;
+      m2.vy = 0;
+      updateMission2Readouts();
+      drawMission2();
+    }
+
+    function startMission2() {
+      if (m2.finished) {
+        resetMission2State();
+      }
+      m2.running = true;
+      m2.finished = false;
+      setMission2Message(
+        "Mission 2 laeuft: Gebt prograd Schub, um den Erdorbit Richtung Mond zu verlassen.",
+        "warn"
+      );
+    }
+
+    function applyMission2Burn(direction) {
+      if (!m2.running) {
+        return;
+      }
+      const v = Math.hypot(m2.vx, m2.vy);
+      if (v < 1e-6) {
+        return;
+      }
+
+      const dv = direction > 0 ? m2Constants.burnPlus : m2Constants.burnMinus;
+      const ux = m2.vx / v;
+      const uy = m2.vy / v;
+      const signedDv = direction > 0 ? dv : -dv;
+      m2.vx += ux * signedDv;
+      m2.vy += uy * signedDv;
+      m2.deltaV += dv;
+      updateMission2Readouts();
+
+      if (direction > 0) {
+        setMission2Message("Schubimpuls gesetzt: Bahn wird weiter nach aussen gezogen.", "warn");
+      } else {
+        setMission2Message("Bremsimpuls gesetzt: Geschwindigkeit wurde reduziert.", "warn");
+      }
+    }
+
+    function normalizeAngleDelta(delta) {
+      let d = delta;
+      while (d > Math.PI) d -= Math.PI * 2;
+      while (d < -Math.PI) d += Math.PI * 2;
+      return d;
+    }
+
+    function stepMission2(dt) {
+      if (!m2.running) {
+        return;
+      }
+
+      const dxE = m2.x - m2Constants.earthX;
+      const dyE = m2.y - m2Constants.earthY;
+      const rE = Math.hypot(dxE, dyE);
+      const dxM = m2.x - m2Constants.moonX;
+      const dyM = m2.y - m2Constants.moonY;
+      const rM = Math.hypot(dxM, dyM);
+
+      const invRe3 = 1 / Math.max(rE * rE * rE, 1);
+      const invRm3 = 1 / Math.max(rM * rM * rM, 1);
+      const ax = -m2Constants.muEarth * dxE * invRe3 - m2Constants.muMoon * dxM * invRm3;
+      const ay = -m2Constants.muEarth * dyE * invRe3 - m2Constants.muMoon * dyM * invRm3;
+
+      m2.vx += ax * dt;
+      m2.vy += ay * dt;
+      m2.x += m2.vx * dt;
+      m2.y += m2.vy * dt;
+
+      m2.trail.push({ x: m2.x, y: m2.y });
+      if (m2.trail.length > 1800) {
+        m2.trail.shift();
+      }
+
+      const newDxE = m2.x - m2Constants.earthX;
+      const newDyE = m2.y - m2Constants.earthY;
+      const newRE = Math.hypot(newDxE, newDyE);
+      const newDxM = m2.x - m2Constants.moonX;
+      const newDyM = m2.y - m2Constants.moonY;
+      const newRM = Math.hypot(newDxM, newDyM);
+
+      if (newRE <= m2Constants.earthRadius) {
+        m2.running = false;
+        m2.finished = true;
+        setMission2Message("Mission 2 fehlgeschlagen: Absturz auf der Erde.", "bad");
+        return;
+      }
+
+      if (newRM <= m2Constants.moonRadius) {
+        m2.running = false;
+        m2.finished = true;
+        setMission2Message("Mission 2 fehlgeschlagen: Aufprall auf dem Mond.", "bad");
+        return;
+      }
+
+      if (newRE >= m2Constants.escapeRadius) {
+        m2.running = false;
+        m2.finished = true;
+        setMission2Message("Mission 2 fehlgeschlagen: Rakete ist aus dem Erde-Mond-System entkommen.", "bad");
+        return;
+      }
+
+      if (m2.phaseId === 0 && newRM < m2Constants.moonCaptureRadius) {
+        m2.phaseId = 1;
+        setMission2Message(
+          "Mondnaehe erreicht: Jetzt bremsen, damit eine gebundene Mondbahn entsteht.",
+          "warn"
+        );
+      }
+
+      const inMoonOrbitBand = newRM >= m2Constants.moonOrbitMin && newRM <= m2Constants.moonOrbitMax;
+      if (inMoonOrbitBand) {
+        const moonAngle = Math.atan2(newDyM, newDxM);
+        if (m2.moonAnglePrev !== null) {
+          const delta = normalizeAngleDelta(moonAngle - m2.moonAnglePrev);
+          m2.moonAngleAccum += Math.abs(delta);
+        }
+        m2.moonAnglePrev = moonAngle;
+
+        if (m2.phaseId < 2) {
+          m2.phaseId = 2;
+          setMission2Message(
+            "Mondorbit aktiv: Haltet die Bahn stabil, bis mindestens eine volle Umrundung geschafft ist.",
+            "warn"
+          );
+        }
+
+        if (m2.moonAngleAccum >= Math.PI * 2 && m2.phaseId < 3) {
+          m2.phaseId = 3;
+          m2.moonAnglePrev = null;
+          setMission2Message(
+            "Mondumrundung geschafft! Jetzt passenden Schub fuer den Ruecktransfer zur Erde setzen.",
+            "good"
+          );
+        }
+      } else if (m2.phaseId < 3) {
+        m2.moonAnglePrev = null;
+      }
+
+      if (m2.phaseId >= 3) {
+        const v = Math.hypot(m2.vx, m2.vy);
+        const circularV = Math.sqrt(m2Constants.muEarth / Math.max(newRE, 1));
+        const nearEarthOrbit = newRE > m2Constants.earthReturnMin && newRE < m2Constants.earthReturnMax;
+        const goodSpeed = Math.abs(v - circularV) < 2.5;
+        if (nearEarthOrbit && goodSpeed && newRM > m2Constants.moonCaptureRadius) {
+          m2.phaseId = 4;
+          m2.running = false;
+          m2.finished = true;
+          setMission2Message(
+            "Mission 2 erfolgreich: Rueckkehr in eine gebundene Erdumlaufbahn nach Mondumrundung.",
+            "good"
+          );
+        }
+      }
+
+      updateMission2Readouts();
+    }
+
+    function drawMission2Body(img, bounds, x, y, radius, fallbackColor) {
+      if (img.complete) {
+        if (bounds) {
+          m2ctx.drawImage(
+            img,
+            bounds.sx,
+            bounds.sy,
+            bounds.sw,
+            bounds.sh,
+            x - radius,
+            y - radius,
+            radius * 2,
+            radius * 2
+          );
+        } else {
+          m2ctx.drawImage(img, x - radius, y - radius, radius * 2, radius * 2);
+        }
+        return;
+      }
+
+      m2ctx.fillStyle = fallbackColor;
+      m2ctx.beginPath();
+      m2ctx.arc(x, y, radius, 0, Math.PI * 2);
+      m2ctx.fill();
+    }
+
+    function drawMission2Rocket() {
+      const rocketBounds = imageBounds.rocket;
+      const sourceW = rocketBounds ? rocketBounds.sw : rocketImg.naturalWidth;
+      const sourceH = rocketBounds ? rocketBounds.sh : rocketImg.naturalHeight;
+      const aspect = (sourceW > 0 && sourceH > 0) ? sourceW / sourceH : 1.5;
+      const w = 68;
+      const h = w / aspect;
+      const heading = Math.atan2(m2.vy, m2.vx);
+      const spriteForwardOffset = Math.PI / 4;
+
+      m2ctx.save();
+      m2ctx.translate(m2.x, m2.y);
+      m2ctx.rotate(heading + spriteForwardOffset);
+      if (rocketBounds) {
+        m2ctx.drawImage(
+          rocketImg,
+          rocketBounds.sx,
+          rocketBounds.sy,
+          rocketBounds.sw,
+          rocketBounds.sh,
+          -w / 2,
+          -h / 2,
+          w,
+          h
+        );
+      } else {
+        m2ctx.drawImage(rocketImg, -w / 2, -h / 2, w, h);
+      }
+      m2ctx.restore();
+    }
+
+    function drawMission2() {
+      m2ctx.clearRect(0, 0, mission2Canvas.width, mission2Canvas.height);
+
+      for (const star of m2StarField) {
+        m2ctx.fillStyle = `rgba(214, 230, 255, ${star.a})`;
+        m2ctx.beginPath();
+        m2ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+        m2ctx.fill();
+      }
+
+      m2ctx.strokeStyle = "rgba(127, 176, 255, 0.24)";
+      m2ctx.setLineDash([8, 8]);
+      m2ctx.lineWidth = 2;
+      m2ctx.beginPath();
+      m2ctx.arc(m2Constants.earthX, m2Constants.earthY, m2Constants.startOrbitR, 0, Math.PI * 2);
+      m2ctx.stroke();
+      m2ctx.beginPath();
+      m2ctx.arc(
+        m2Constants.moonX,
+        m2Constants.moonY,
+        (m2Constants.moonOrbitMin + m2Constants.moonOrbitMax) / 2,
+        0,
+        Math.PI * 2
+      );
+      m2ctx.stroke();
+      m2ctx.setLineDash([]);
+
+      drawMission2Body(
+        earthImg,
+        imageBounds.earth,
+        m2Constants.earthX,
+        m2Constants.earthY,
+        m2Constants.earthRadius,
+        "#2f6fb2"
+      );
+      drawMission2Body(
+        moonImg,
+        imageBounds.moon,
+        m2Constants.moonX,
+        m2Constants.moonY,
+        m2Constants.moonRadius,
+        "#a8b1bf"
+      );
+
+      if (m2.trail.length > 1) {
+        m2ctx.strokeStyle = "rgba(124, 220, 255, 0.78)";
+        m2ctx.lineWidth = 2;
+        m2ctx.beginPath();
+        m2ctx.moveTo(m2.trail[0].x, m2.trail[0].y);
+        for (let i = 1; i < m2.trail.length; i += 1) {
+          m2ctx.lineTo(m2.trail[i].x, m2.trail[i].y);
+        }
+        m2ctx.stroke();
+      }
+
+      drawMission2Rocket();
+    }
+
+    function loop(now) {
+      const dt = Math.min((now - lastFrame) / 1000, 0.03);
+      lastFrame = now;
+
+      const simDt = dt * constants.simSpeedFactor;
+      let remaining = simDt;
+      while (remaining > 0 && sim.running) {
+        const step = Math.min(constants.integrationStep, remaining);
+        stepSimulation(step);
+        remaining -= step;
+      }
+
+      const m2Dt = dt * m2Constants.simSpeedFactor;
+      let m2Remaining = m2Dt;
+      while (m2Remaining > 0 && m2.running) {
+        const step = Math.min(m2Constants.integrationStep, m2Remaining);
+        stepMission2(step);
+        m2Remaining -= step;
+      }
+
+      drawScene();
+      drawMission2();
+      requestAnimationFrame(loop);
+    }
+
+    startStoryBtn.addEventListener("click", startStory);
+    launchBtn.addEventListener("click", startLaunch);
+    resetBtn.addEventListener("click", () => {
+      resetSimState();
+      setMissionMessage("Reset erledigt. Schub einstellen und erneut starten.", "warn");
+    });
+
+    thrustSlider.addEventListener("input", () => {
+      updateSpeedDisplay();
+      if (sim.running || sim.finished) {
+        startLaunch({ fromSlider: true });
+      }
+    });
+    m2StartBtn.addEventListener("click", startMission2);
+    m2ResetBtn.addEventListener("click", () => {
+      resetMission2State();
+      setMission2Message("Mission 2 wurde zurueckgesetzt. Startet neu im Erdorbit.", "warn");
+    });
+    m2BurnPlusBtn.addEventListener("click", () => applyMission2Burn(1));
+    m2BurnMinusBtn.addEventListener("click", () => applyMission2Burn(-1));
+
+    updateSpeedDisplay();
+    resetSimState();
+    resetMission2State();
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
