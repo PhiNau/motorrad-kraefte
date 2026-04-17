@@ -385,6 +385,14 @@
 
         <div class="control">
           <div class="label-line">
+            <strong>Kurvenradius r</strong>
+            <span id="radiusSliderValue">45.0 m</span>
+          </div>
+          <input id="radius" type="range" min="20" max="120" step="1" value="45" aria-label="Kurvenradius in Meter">
+        </div>
+
+        <div class="control">
+          <div class="label-line">
             <strong>Schräglage α</strong>
             <span id="leanValue">35.0°</span>
           </div>
@@ -392,7 +400,7 @@
         </div>
 
         <div class="facts" aria-live="polite">
-          <div><span>Kurvenradius (fest)</span><span id="radiusValue">45.0 m</span></div>
+          <div><span>Kurvenradius</span><span id="radiusValue">45.0 m</span></div>
           <div><span>Querbeschleunigung a = v²/r</span><span id="aValue">0.00 m/s²</span></div>
           <div><span>Quer-/Zentripetalkraft <span class="force-symbol">F<sub>Z</sub></span></span><span id="fzValue">0 N</span></div>
           <div><span>Gewichtskraft <span class="force-symbol">F<sub>G</sub></span></span><span id="fgValue">0 N</span></div>
@@ -452,15 +460,16 @@
   <script>
     const g = 9.81;
     const mass = 250;
-    const radius = 45;
     const contactX = 340;
     const contactY = 560;
     const comDistance = 300;
 
     const speed = document.getElementById("speed");
+    const radiusSlider = document.getElementById("radius");
     const lean = document.getElementById("lean");
 
     const speedValue = document.getElementById("speedValue");
+    const radiusSliderValue = document.getElementById("radiusSliderValue");
     const leanValue = document.getElementById("leanValue");
     const radiusValue = document.getElementById("radiusValue");
     const aValue = document.getElementById("aValue");
@@ -523,6 +532,7 @@
 
     function update() {
       const speedKmh = Number(speed.value);
+      const radius = Number(radiusSlider.value);
       const alphaDeg = Number(lean.value);
       const v = speedKmh / 3.6;
       const alphaRad = alphaDeg * Math.PI / 180;
@@ -597,6 +607,7 @@
       setCom(comX, comY);
 
       speedValue.textContent = `${speedKmh.toFixed(0)} km/h`;
+      radiusSliderValue.textContent = `${radius.toFixed(1)} m`;
       leanValue.textContent = `${alphaDeg.toFixed(1)}°`;
       radiusValue.textContent = `${radius.toFixed(1)} m`;
       aValue.textContent = `${aSide.toFixed(2)} m/s²`;
@@ -617,6 +628,7 @@
     }
 
     speed.addEventListener("input", update);
+    radiusSlider.addEventListener("input", update);
     lean.addEventListener("input", update);
     update();
   </script>
