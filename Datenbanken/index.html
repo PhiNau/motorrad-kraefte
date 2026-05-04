@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ER-Diagramm Editor</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <aside class="sidebar" aria-label="Werkzeuge">
+        <header class="brand">
+          <div>
+            <h1>ER-Diagramm</h1>
+            <p>Entitäten, Attribute, Beziehungen und Kardinalitäten erstellen.</p>
+          </div>
+        </header>
+
+        <section class="panel">
+          <h2>Entität</h2>
+          <form id="entity-form" class="form">
+            <label>
+              Name
+              <input id="entity-name" type="text" placeholder="z. B. Kunde" autocomplete="off" required>
+            </label>
+            <label>
+              Attribute
+              <textarea id="entity-attributes" rows="3" placeholder="Vorname, Nachname, Benutzername*"></textarea>
+            </label>
+            <p class="hint">Schlüsselattribute mit * markieren.</p>
+            <button type="submit">Entität hinzufügen</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <h2>Beziehung</h2>
+          <form id="relationship-form" class="form">
+            <label>
+              Name
+              <input id="relationship-name" type="text" placeholder="z. B. bestellt" autocomplete="off" required>
+            </label>
+            <div class="split">
+              <label>
+                Von
+                <select id="relationship-from" required></select>
+              </label>
+              <label>
+                Kard.
+                <input id="relationship-from-cardinality" type="text" value="1" autocomplete="off" required>
+              </label>
+            </div>
+            <div class="split">
+              <label>
+                Nach
+                <select id="relationship-to" required></select>
+              </label>
+              <label>
+                Kard.
+                <input id="relationship-to-cardinality" type="text" value="n" autocomplete="off" required>
+              </label>
+            </div>
+            <label>
+              Beziehungsattribute
+              <input id="relationship-attributes" type="text" placeholder="z. B. Anzahl">
+            </label>
+            <button type="submit">Beziehung hinzufügen</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <h2>Elemente</h2>
+          <div id="items-list" class="items-list" aria-live="polite"></div>
+        </section>
+
+        <section class="panel compact">
+          <div class="toolbar">
+            <button id="sample-button" type="button">Beispiel laden</button>
+            <button id="clear-button" type="button">Leeren</button>
+          </div>
+          <button id="export-button" type="button" class="secondary">SVG exportieren</button>
+        </section>
+      </aside>
+
+      <section class="workspace" aria-label="Diagrammfläche">
+        <div class="workspace-head">
+          <div>
+            <h2>Entwurfsdiagramm</h2>
+            <p>Elemente können auf der Zeichenfläche verschoben werden.</p>
+          </div>
+          <div class="status" id="status">Automatisch gespeichert</div>
+        </div>
+        <div class="canvas-wrap">
+          <svg id="diagram" viewBox="0 0 1400 850" role="img" aria-label="ER-Diagramm Zeichenfläche">
+            <defs>
+              <marker id="line-dot" markerWidth="8" markerHeight="8" refX="4" refY="4">
+                <circle cx="4" cy="4" r="2" fill="#2f3a3f"></circle>
+              </marker>
+            </defs>
+            <g id="diagram-layer"></g>
+          </svg>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
